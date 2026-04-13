@@ -46,21 +46,36 @@ def classify_result(symbols: list[str], final_state: str) -> tuple[str, int]:
     has_s = "S" in symbol_set
     has_a = "A" in symbol_set
     has_u = "U" in symbol_set
+    has_p = "P" in symbol_set
 
-    # Aman
+    # 1) Aman murni
     if symbols == ["N"] or final_state == "q0":
         return "Aman", 0
 
-    # Jika belum ada kombinasi sasaran + kata kasar,
-    # maka jangan pernah naik ke bullying / berat.
-    # Tetap Waspada saja.
-    if not (has_k and has_s):
+    # 2) Kalau hanya ada sasaran / penguat tanpa kata kasar dan tanpa ancaman,
+    #    harus tetap Aman
+    if has_s and not has_k and not has_a:
+        return "Aman", 0
+
+    # 3) Kalau hanya ada penguat tanpa unsur lain, juga Aman
+    if has_p and not has_k and not has_s and not has_a:
+        return "Aman", 0
+
+    # 4) Waspada:
+    #    - ada kata kasar tanpa sasaran
+    #    - ada ancaman tanpa sasaran+kata kasar lengkap
+    if has_k and not has_s:
         return "Waspada", 0
 
-    # Berat hanya jika konteks bullying sudah lengkap
-    # dan diperkuat ancaman / ulangan / final qF
-    if final_state == "qF" or has_a or has_u:
-        return "Indikasi Bullying Berat", 3
+    if has_a and not (has_k and has_s):
+        return "Waspada", 0
 
-    # Jika sudah ada sasaran + kata kasar tapi belum berat
-    return "Indikasi Bullying", 1
+    # 5) Kalau sudah ada pasangan sasaran + kata kasar,
+    #    baru bisa masuk bullying / bullying berat
+    if has_k and has_s:
+        if final_state == "qF" or has_a or has_u:
+            return "Indikasi Bullying Berat", 3
+        return "Indikasi Bullying", 1
+
+    # fallback aman
+    return "Aman", 0
