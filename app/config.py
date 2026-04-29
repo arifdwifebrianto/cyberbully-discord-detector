@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -28,34 +28,40 @@ def _parse_optional_int(raw_value: str | None) -> int | None:
     raw_value = raw_value.strip()
     if not raw_value:
         return None
-    value = int(raw_value)
-    return value or None
+    return int(raw_value)
 
 
 @dataclass(frozen=True)
 class Settings:
-    base_dir: Path = BASE_DIR
-    data_dir: Path = BASE_DIR / "data"
-    dictionaries_dir: Path = BASE_DIR / "data" / "dictionaries"
-    discord_bot_token: str = os.getenv("DISCORD_BOT_TOKEN", "")
-    discord_guild_id: int | None = _parse_optional_int(os.getenv("DISCORD_GUILD_ID"))
-    discord_allowed_channel_ids: list[int] = None  # type: ignore[assignment]
-    flask_host: str = os.getenv("FLASK_HOST", "127.0.0.1")
-    flask_port: int = int(os.getenv("FLASK_PORT", "5000"))
-    database_path: Path = BASE_DIR / os.getenv("DATABASE_PATH", "app.db")
-    run_mode: str = os.getenv("RUN_MODE", "both").lower().strip()
-    dashboard_debug: bool = os.getenv("DASHBOARD_DEBUG", "true").lower() == "true"
-    warning_delete_after_seconds: int = int(os.getenv("WARNING_DELETE_AFTER_SECONDS", "10"))
-    kick_violation_threshold: int = int(
-        os.getenv("KICK_VIOLATION_THRESHOLD", os.getenv("KICK_STRIKE_THRESHOLD", "3"))
+    base_dir: Path
+    data_dir: Path
+    dictionaries_dir: Path
+    discord_bot_token: str
+    discord_guild_id: int | None
+    discord_allowed_channel_ids: list[int] = field(default_factory=list)
+    flask_host: str = "127.0.0.1"
+    flask_port: int = 5000
+    database_path: Path = BASE_DIR / "app.db"
+    run_mode: str = "both"
+    dashboard_debug: bool = True
+    kick_violation_threshold: int = 3
+
+
+def load_settings() -> Settings:
+    return Settings(
+        base_dir=BASE_DIR,
+        data_dir=BASE_DIR / "data",
+        dictionaries_dir=BASE_DIR / "data" / "dictionaries",
+        discord_bot_token=os.getenv("DISCORD_BOT_TOKEN", ""),
+        discord_guild_id=_parse_optional_int(os.getenv("DISCORD_GUILD_ID")),
+        discord_allowed_channel_ids=_parse_csv_ints(os.getenv("DISCORD_ALLOWED_CHANNEL_IDS", "")),
+        flask_host=os.getenv("FLASK_HOST", "127.0.0.1"),
+        flask_port=int(os.getenv("FLASK_PORT", "5000")),
+        database_path=BASE_DIR / os.getenv("DATABASE_PATH", "app.db"),
+        run_mode=os.getenv("RUN_MODE", "both").lower().strip(),
+        dashboard_debug=os.getenv("DASHBOARD_DEBUG", "true").lower() == "true",
+        kick_violation_threshold=int(os.getenv("KICK_VIOLATION_THRESHOLD", "3")),
     )
 
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "discord_allowed_channel_ids",
-            _parse_csv_ints(os.getenv("DISCORD_ALLOWED_CHANNEL_IDS", "")),
-        )
 
-
-settings = Settings()
+settings = load_settings()

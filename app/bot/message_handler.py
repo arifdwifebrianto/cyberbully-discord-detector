@@ -43,26 +43,29 @@ async def handle_incoming_message(message: Message) -> None:
     violation_points_added = 0
     total_violation_points = 0
 
+    # Aman -> tidak ada aksi
     if label == "Aman":
         pass
 
+    # Waspada -> delete + warning, tanpa poin pelanggaran
     elif label == "Waspada":
         message_deleted = await _delete_message(message)
         action_steps.append("delete" if message_deleted else "delete_failed")
 
         await _send_warning(
             message,
-            "peringatan toxic: pesan dihapus karena mengandung kata tidak pantas.",
+            "peringatan toxic: pesan dihapus karena mengandung kata tidak pantas."
         )
         action_steps.append("warn")
 
+    # Indikasi Bullying -> delete + warning + pelanggaran 1
     elif label == "Indikasi Bullying":
         message_deleted = await _delete_message(message)
         action_steps.append("delete" if message_deleted else "delete_failed")
 
         await _send_warning(
             message,
-            "peringatan: pesan dihapus karena terindikasi cyberbullying. Pelanggaran +1.",
+            "peringatan: pesan dihapus karena terindikasi cyberbullying. Pelanggaran +1."
         )
         action_steps.append("warn")
 
@@ -74,13 +77,14 @@ async def handle_incoming_message(message: Message) -> None:
         )
         action_steps.append("pelanggaran+1")
 
+    # Indikasi Bullying Berat -> delete + warning + pelanggaran 3
     elif label == "Indikasi Bullying Berat":
         message_deleted = await _delete_message(message)
         action_steps.append("delete" if message_deleted else "delete_failed")
 
         await _send_warning(
             message,
-            "peringatan keras: pesan dihapus karena terindikasi cyberbullying berat. Pelanggaran +3.",
+            "peringatan keras: pesan dihapus karena terindikasi cyberbullying berat. Pelanggaran +3."
         )
         action_steps.append("warn")
 
@@ -92,6 +96,7 @@ async def handle_incoming_message(message: Message) -> None:
         )
         action_steps.append("pelanggaran+3")
 
+    # Kick jika total pelanggaran mencapai threshold
     if (
         label in {"Indikasi Bullying", "Indikasi Bullying Berat"}
         and message.guild
