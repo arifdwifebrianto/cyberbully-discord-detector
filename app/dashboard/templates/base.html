@@ -14,6 +14,7 @@
                 <h1>{% block page_title %}Dashboard Deteksi Cyberbullying{% endblock %}</h1>
                 <p class="subtext">Pemantauan moderasi Discord berbasis regular expression dan finite automata.</p>
             </div>
+
             <nav class="topnav">
                 <a href="{{ url_for('index') }}" class="nav-link {% if request.path == '/' %}active{% endif %}">Ringkasan</a>
                 <a href="{{ url_for('messages') }}" class="nav-link {% if request.path == '/messages' %}active{% endif %}">Log Pesan</a>

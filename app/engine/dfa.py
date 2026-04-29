@@ -53,7 +53,6 @@ def classify_result(symbols: list[str], final_state: str) -> tuple[str, int]:
         return "Aman", 0
 
     # 2) Kalau hanya ada sasaran / penguat tanpa kata kasar dan tanpa ancaman,
-    #    harus tetap Aman
     if has_s and not has_k and not has_a:
         return "Aman", 0
 
