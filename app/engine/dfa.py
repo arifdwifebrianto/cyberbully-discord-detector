@@ -28,6 +28,16 @@ TRANSITIONS: dict[str, dict[str, str]] = {
 }
 
 
+STATE_CLASSIFICATION: dict[str, tuple[str, int]] = {
+    "q0": ("Aman", 0),
+    "q1": ("Waspada", 0),
+    "q2": ("Aman", 0),
+    "q3": ("Indikasi Bullying", 1),
+    "q4": ("Indikasi Bullying", 1),
+    "qF": ("Indikasi Bullying Berat", 3),
+}
+
+
 def run_dfa(symbols: list[str]) -> tuple[list[str], str]:
     state = "q0"
     trace = [state]
@@ -40,41 +50,9 @@ def run_dfa(symbols: list[str]) -> tuple[list[str], str]:
 
 
 def classify_result(symbols: list[str], final_state: str) -> tuple[str, int]:
-    symbol_set = set(symbols)
-
-    has_k = "K" in symbol_set
-    has_s = "S" in symbol_set
-    has_a = "A" in symbol_set
-    has_u = "U" in symbol_set
-    has_p = "P" in symbol_set
-
-    # 1) Aman murni
-    if symbols == ["N"] or final_state == "q0":
-        return "Aman", 0
-
-    # 2) Kalau hanya ada sasaran / penguat tanpa kata kasar dan tanpa ancaman,
-    if has_s and not has_k and not has_a:
-        return "Aman", 0
-
-    # 3) Kalau hanya ada penguat tanpa unsur lain, juga Aman
-    if has_p and not has_k and not has_s and not has_a:
-        return "Aman", 0
-
-    # 4) Waspada:
-    #    - ada kata kasar tanpa sasaran
-    #    - ada ancaman tanpa sasaran+kata kasar lengkap
-    if has_k and not has_s:
+    # Tanpa state tambahan, simbol A yang tidak membawa DFA ke qF
+    # tetap diperlakukan sebagai ancaman mandiri / belum lengkap.
+    if "A" in symbols and final_state in {"q0", "q1", "q2"}:
         return "Waspada", 0
 
-    if has_a and not (has_k and has_s):
-        return "Waspada", 0
-
-    # 5) Kalau sudah ada pasangan sasaran + kata kasar,
-    #    baru bisa masuk bullying / bullying berat
-    if has_k and has_s:
-        if final_state == "qF" or has_a or has_u:
-            return "Indikasi Bullying Berat", 3
-        return "Indikasi Bullying", 1
-
-    # fallback aman
-    return "Aman", 0
+    return STATE_CLASSIFICATION.get(final_state, ("Aman", 0))

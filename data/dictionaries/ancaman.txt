@@ -19,3 +19,4 @@ hantam
 gasak
 dorong
 cekik
+tikam
