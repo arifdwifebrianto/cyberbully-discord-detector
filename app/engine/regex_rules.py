@@ -31,6 +31,7 @@ DEFAULT_KATA_KASAR_ALIASES = {
     "bgst",
     "brngsk",
     "njing",
+    "anj",
 }
 
 DEFAULT_SASARAN = {

@@ -12,7 +12,7 @@ def register_filters(app: Flask) -> None:
             "Indikasi Bullying": "badge badge-danger",
             "Indikasi Bullying Berat": "badge badge-danger-strong",
         }
-        return mapping.get(label, "badge")
+        return mapping.get(label, "badge badge-neutral")
 
     @app.template_filter("action_parts")
     def action_parts(action_taken: str) -> list[str]:
