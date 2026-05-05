@@ -52,7 +52,5 @@ def run_dfa(symbols: list[str]) -> tuple[list[str], str]:
 def classify_result(symbols: list[str], final_state: str) -> tuple[str, int]:
     # Tanpa state tambahan, simbol A yang tidak membawa DFA ke qF
     # tetap diperlakukan sebagai ancaman mandiri / belum lengkap.
-    if "A" in symbols and final_state in {"q0", "q1", "q2"}:
-        return "Waspada", 0
 
     return STATE_CLASSIFICATION.get(final_state, ("Aman", 0))

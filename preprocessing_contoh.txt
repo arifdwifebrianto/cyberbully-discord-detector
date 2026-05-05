@@ -1,0 +1,91 @@
+Contoh Hasil Preprocessing
+
+File ini berisi contoh kata atau kalimat yang sengaja dibuat agak disamarkan seperti yang sering muncul di chat atau komentar toxic, lalu ditunjukkan hasilnya setelah masuk ke tahap preprocessing di proyek ini.
+
+Contoh Input dan Hasil
+
+1. Input asli: g00bl000kk
+   Hasil normalize_text: g00bl000kk
+   Hasil normalize_obfuscation: gooblokk
+   Keterangan: Angka 0 diubah jadi o, lalu huruf berulang 3+ dipangkas.
+
+2. Input asli: @nj!ng
+   Hasil normalize_text: @nj!ng
+   Hasil normalize_obfuscation: anjing
+   Keterangan: Simbol @ jadi a dan ! jadi i.
+
+3. Input asli: B4B1
+   Hasil normalize_text: b4b1
+   Hasil normalize_obfuscation: babi
+   Keterangan: 4 jadi a dan 1 jadi i.
+
+4. Input asli: t0l0l
+   Hasil normalize_text: t0l0l
+   Hasil normalize_obfuscation: tolol
+   Keterangan: Angka 0 diganti o.
+
+5. Input asli: gobloooook
+   Hasil normalize_text: gobloooook
+   Hasil normalize_obfuscation: goblok
+   Keterangan: Huruf o yang diulang dipangkas.
+
+6. Input asli: A N J I N G
+   Hasil normalize_text: a n j i n g
+   Hasil normalize_obfuscation: a n j i n g
+   Keterangan: Spasi dirapikan, lalu tetap dipertahankan sebagai token terpisah.
+
+7. Input asli: anji\u0000ng
+   Hasil normalize_text: anjing
+   Hasil normalize_obfuscation: anjing
+   Keterangan: Karakter zero-width dihapus.
+
+8. Input asli: @Nj1n999
+   Hasil normalize_text: @nj1n999
+   Hasil normalize_obfuscation: anjing
+   Keterangan: @ jadi a, 1 jadi i, 9 jadi g, lalu huruf g berulang dipangkas jadi satu.
+
+9. Input asli: @-N j 1 n*9g9
+   Hasil normalize_text: @-n j 1 n*9g9
+   Hasil normalize_obfuscation: a n j i n g
+   Keterangan: Tanda baca seperti - dan * dihapus, @ jadi a, 1 jadi i, 9 jadi g, lalu hasil akhirnya dirapikan jadi spasi satu-satu.
+
+Apa Saja Yang Dilakukan Preprocessing
+
+Di proyek ini, preprocessing ada dua tahap utama:
+
+1. normalize_text
+   - Mengubah Unicode ke bentuk NFKC.
+   - Menghapus karakter zero-width.
+   - Mengubah semua huruf menjadi lowercase.
+   - Merapikan spasi berlebih.
+
+2. normalize_obfuscation
+   - Menjalankan semua langkah normalize_text.
+   - Mengganti karakter leetspeak dengan huruf normal:
+     - 0 -> o
+     - 1 -> i
+     - 3 -> e
+     - 4 -> a
+     - 5 -> s
+     - 6 -> g
+     - 7 -> t
+     - 8 -> b
+     - 9 -> g
+     - @ -> a
+     - $ -> s
+     - ! -> i
+   - Menghapus karakter selain huruf dan spasi.
+   - Memendekkan huruf berulang yang muncul 3 kali atau lebih.
+   - Merapikan spasi lagi di akhir.
+
+Output Tambahan
+
+Fungsi build_text_variants() juga membuat versi tambahan:
+
+- raw_lower: teks asli yang sudah lowercase dan dirapikan spasinya.
+- normalized_text: hasil normalisasi obfuscation.
+- compact_text: normalized_text tanpa spasi, berguna untuk mencocokkan kata yang dipisah-pisah.
+
+Catatan Penting
+
+Aturan pengurangan huruf berulang di kode saat ini hanya memangkas pengulangan 3 kali atau lebih. Jadi bentuk seperti gooblookk masih bisa tersisa dengan huruf dobel. Kalau ingin hasil yang lebih agresif, aturan ini perlu diperketat lagi.
